@@ -1,0 +1,37 @@
+---
+name: Snapcraft
+on:
+  workflow_run:
+    workflows: ["Release"]
+    push:
+      tags:
+        - "*"
+    types:
+      - completed
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: snapcore/action-build@v1
+        with:
+          path: build/package
+        id: snapcraft
+      - run: |
+          sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
+          #rust-lldb --version
+          #ruzt.rust-gdb --version
+          ruzt.rustfmt --version | grep "[0-9]\."
+          ruzt.rustdoc --version | grep "[0-9]\."
+          ruzt.rustc --version | grep "[0-9]\."
+          #ruzt.rls --version
+          #ruzt.clippy-driver --version | grep "[0-9]\."
+          #ruzt.cargo-fmt --version
+          #ruzt.cargo-clippy --version
+          ruzt.cargo --version | grep "[0-9]\."
+      - uses: snapcore/action-publish@v1
+        with:
+          store_login: ${{ secrets.SNAPCRAFT_LOGIN }}
+          snap: ${{ steps.snapcraft.outputs.snap }}
+          release: stable
+
