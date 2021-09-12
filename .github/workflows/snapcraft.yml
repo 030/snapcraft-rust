@@ -1,10 +1,9 @@
 ---
 name: Snapcraft
 on:
-  workflow_run:
-    push:
-      tags:
-        - "*"
+  push:
+    tags:        
+      - "*" 
 jobs:
   release:
     runs-on: ubuntu-latest
